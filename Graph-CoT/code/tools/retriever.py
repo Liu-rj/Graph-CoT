@@ -36,7 +36,7 @@ class Retriever:
         self.use_gpu = args.faiss_gpu
         self.node_text_keys = args.node_text_keys
         self.model_name = args.embedder_name
-        self.model = sentence_transformers.SentenceTransformer(args.embedder_name)
+        self.model = sentence_transformers.SentenceTransformer(args.embedder_name, device="cuda")
         self.graph = graph
         self.cache = args.embed_cache
         self.cache_dir = args.embed_cache_dir
@@ -47,6 +47,7 @@ class Retriever:
 
         docs, ids, meta_type = self.process_graph()
         save_model_name = self.model_name.split('/')[-1]
+        print("process graph finish")
 
         if self.cache and os.path.isfile(os.path.join(self.cache_dir, f'cache-{save_model_name}.pkl')):
             embeds, self.doc_lookup, self.doc_type = pickle.load(open(os.path.join(self.cache_dir, f'cache-{save_model_name}.pkl'), 'rb'))

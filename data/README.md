@@ -19,9 +19,9 @@ cd data/raw_data/{data_name}
 ```
 Run the cells in raw_process.ipynb
 
-The script will process the raw data and save it as a graph.json file.
+The script will process the raw data and save it as a graph.pkl file.
 ```
-graph.json:{
+graph.pkl:{
     type1_nodes (Dict),
     type2_nodes (Dict),
     ...
@@ -33,7 +33,7 @@ type1_nodes:{
 ```
 E.g., for the DBLP academic graph:
 ```
-graph.json:{
+graph.pkl:{
     paper_nodes (Dict),
     author_nodes (Dict),
     venue_nodes (Dict),

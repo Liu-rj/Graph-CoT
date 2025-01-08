@@ -1,17 +1,17 @@
 OPENAI_KEY=xxx
-GPT_version=gpt-3.5-turbo-16k
-max_steps=10
+GPT_version=claude-3-5-sonnet
+max_steps=20
 
-DATASET=dblp # legal, biomedical, amazon, goodreads, dblp
-DATA_PATH=/shared/data3/bowenj4/llm-graph-plugin/data/processed_data/$DATASET
-SAVE_FILE=/shared/data3/bowenj4/llm-graph-plugin/Graph-CoT/results/$GPT_version/$DATASET/results.jsonl
+DATASET=goodreads # legal, biomedical, amazon, goodreads, dblp
+DATA_PATH=/home/ubuntu/graphrag_planner/examples/datasets/$DATASET
+SAVE_FILE=/home/ubuntu/Graph-CoT/Graph-CoT/results/$GPT_version/$DATASET/results.jsonl
 
-DATASET=maple
-SUBDATASET=Chemistry # Biology, Chemistry, Materials_Science, Medicine, Physics
-DATA_PATH=/shared/data3/bowenj4/llm-graph-plugin/data/processed_data/maple/$SUBDATASET
-SAVE_FILE=/shared/data3/bowenj4/llm-graph-plugin/Graph-CoT/results/$GPT_version/maple-$SUBDATASET/results.jsonl
+# DATASET=maple
+# SUBDATASET=Physics # Biology, Chemistry, Materials_Science, Medicine, Physics
+# DATA_PATH=/home/ubuntu/graphrag_planner/examples/datasets/maple/$SUBDATASET
+# SAVE_FILE=/home/ubuntu/Graph-CoT/Graph-CoT/results/$GPT_version/maple-$SUBDATASET/results.jsonl
 
-CUDA_VISIBLE_DEVICES=2,3 python ../code/run.py --dataset $DATASET \
+CUDA_VISIBLE_DEVICES=0 python ../code/run.py --dataset $DATASET \
                     --path $DATA_PATH \
                     --save_file $SAVE_FILE \
                     --llm_version $GPT_version \
