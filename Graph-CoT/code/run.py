@@ -26,6 +26,7 @@ parser = argparse.ArgumentParser("")
 parser.add_argument("--dataset", type=str, default="dblp")
 parser.add_argument("--openai_api_key", type=str, default="xxx")
 parser.add_argument("--path", type=str)
+parser.add_argument("--benchmark_dir", type=str)
 parser.add_argument("--save_file", type=str)
 parser.add_argument(
     "--embedder_name", type=str, default="sentence-transformers/all-mpnet-base-v2"
@@ -105,20 +106,9 @@ def main():
         print("############################################")
         print(f"Running for question type: {question_type}")
         contents = []
-        with open(os.path.join(args.path, f"{question_type}.jsonl"), "r") as f:
+        with open(os.path.join(args.benchmark_dir, f"{question_type}.jsonl"), "r") as f:
             for item in jsonlines.Reader(f):
                 contents.append(item)
-
-        contents = [
-            {
-                "qid": 0,
-                "question": "Tell me about 'Mud Vein'.",
-                "entity": {"Mud Vein": "book-18246727"},
-                "type": "single_entity_abstract",
-                "hops": 1,
-                "answer": "N/A",
-            }
-        ]
 
         # unanswered_questions = []
         # correct_logs = []
@@ -126,7 +116,7 @@ def main():
         # incorrect_logs = []
         # generated_text = []
         for i in tqdm(range(len(contents))):
-            print(f'Question {i+1}: {contents[i]["question"]}')
+            print(f"Question {i + 1}: {contents[i]['question']}")
             tic = time.time()
             agent.run(
                 contents[i]["question"], contents[i]["entity"], contents[i]["answer"]
@@ -168,7 +158,6 @@ def main():
                 "gt_answer": contents[i]["answer"],
             }
             print(result_entree)
-            exit()
 
             # generated_text.append(result_entree)
 
