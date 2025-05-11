@@ -55,6 +55,7 @@ assert args.llm_version in [
     "mistralai/Mixtral-8x7B-Instruct-v0.1",
     "meta-llama/Llama-2-13b-chat-hf",
     "claude-3-5-sonnet",
+    "llama-3.1-405b",
 ]
 
 
@@ -97,10 +98,11 @@ def main():
     agent = GraphAgent(args, agent_prompt)
 
     question_types = [
-        "single_entity_abstract",
-        "single_entity_concrete",
-        "multi_entity_abstract",
-        "multi_entity_concrete",
+        # "single_entity_abstract_rephrased",
+        # "single_entity_concrete_rephrased",
+        # "multi_entity_abstract_rephrased",
+        "multi_entity_concrete_rephrased",
+        # "nested_question_rephrased"
     ]
     for question_type in question_types:
         print("############################################")

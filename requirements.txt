@@ -6,3 +6,8 @@ scikit-learn==1.3.2
 sentence-transformers==2.2.2
 transformers==4.36.2
 datasets==2.16.1
+tiktoken
+jsonlines
+networkx
+ipython
+boto3

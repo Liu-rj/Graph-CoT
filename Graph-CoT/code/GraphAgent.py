@@ -7,7 +7,7 @@ import time
 import json
 
 # from langchain_community.llms import OpenAI
-from langchain_community.chat_models import ChatOpenAI
+# from langchain_community.chat_models import ChatOpenAI
 
 from langchain.prompts import PromptTemplate, ChatPromptTemplate
 from graph_prompts import GRAPH_DEFINITION
@@ -40,13 +40,16 @@ class GraphAgent:
             "gpt-3.5-turbo-1106",
             "gpt-3.5-turbo-16k",
         ]:
-            self.llm = ChatOpenAI(
-                temperature=0,
-                max_tokens=300,
-                model_name=args.llm_version,
-                model_kwargs={"stop": "\n"},
+            # self.llm = ChatOpenAI(
+            #     temperature=0,
+            #     max_tokens=300,
+            #     model_name=args.llm_version,
+            #     model_kwargs={"stop": "\n"},
+            # )
+            # self.enc = tiktoken.encoding_for_model("text-davinci-003")
+            raise NotImplementedError(
+                "The OpenAI API is not supported in this version. Please use the Bedrock API instead."
             )
-            self.enc = tiktoken.encoding_for_model("text-davinci-003")
         elif args.llm_version in [
             "meta-llama/Llama-2-13b-chat-hf",
             "mistralai/Mixtral-8x7B-Instruct-v0.1",
@@ -65,6 +68,14 @@ class GraphAgent:
             )
         elif args.llm_version in ["claude-3-5-sonnet"]:
             self.CHAT_MODEL_ID = "anthropic.claude-3-5-sonnet-20240620-v1:0"
+            # self.CHAT_MODEL_ID = "anthropic.claude-3-5-sonnet-20241022-v2:0"
+            self.llm = boto3.client(
+                service_name="bedrock-runtime",
+                region_name="us-west-2",
+            )
+            self.enc = tiktoken.encoding_for_model("text-davinci-003")
+        elif args.llm_version in ["llama-3.1-405b"]:
+            self.CHAT_MODEL_ID = "meta.llama3-1-405b-instruct-v1:0"
             self.llm = boto3.client(
                 service_name="bedrock-runtime",
                 region_name="us-west-2",
