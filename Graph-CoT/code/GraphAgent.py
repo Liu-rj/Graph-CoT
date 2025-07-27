@@ -66,9 +66,8 @@ class GraphAgent:
                 torch_dtype=torch.float16,
                 device_map="auto",
             )
-        elif args.llm_version in ["claude-3-5-sonnet"]:
-            self.CHAT_MODEL_ID = "anthropic.claude-3-5-sonnet-20240620-v1:0"
-            # self.CHAT_MODEL_ID = "anthropic.claude-3-5-sonnet-20241022-v2:0"
+        elif args.llm_version in ["claude-3.5-sonnet"]:
+            self.CHAT_MODEL_ID = "anthropic.claude-3.5-sonnet-20240620-v1:0"
             self.llm = boto3.client(
                 service_name="bedrock-runtime",
                 region_name="us-west-2",
@@ -76,6 +75,20 @@ class GraphAgent:
             self.enc = tiktoken.encoding_for_model("text-davinci-003")
         elif args.llm_version in ["llama-3.1-405b"]:
             self.CHAT_MODEL_ID = "meta.llama3-1-405b-instruct-v1:0"
+            self.llm = boto3.client(
+                service_name="bedrock-runtime",
+                region_name="us-west-2",
+            )
+            self.enc = tiktoken.encoding_for_model("text-davinci-003")
+        elif args.llm_version in ["mistral-large"]:
+            self.CHAT_MODEL_ID = "mistral.mistral-large-2407-v1:0"
+            self.llm = boto3.client(
+                service_name="bedrock-runtime",
+                region_name="us-west-2",
+            )
+            self.enc = tiktoken.encoding_for_model("text-davinci-003")
+        elif args.llm_version in ["deepseek-r1"]:
+            self.CHAT_MODEL_ID = "us.deepseek.r1-v1:0"
             self.llm = boto3.client(
                 service_name="bedrock-runtime",
                 region_name="us-west-2",
@@ -258,7 +271,7 @@ class GraphAgent:
                     max_length=self.config.max_position_embeddings,
                 )
             )
-        elif self.llm_version in ["claude-3-5-sonnet"]:
+        elif self.llm_version in ["claude-3.5-sonnet", "llama-3.1-405b", "mistral-large", "deepseek-r1"]:
             self.api_calls += 1
             prompt = self._build_agent_prompt()
             system = [{"text": prompt[0].content}]
@@ -266,15 +279,16 @@ class GraphAgent:
             self.token_count += len(
                 self.enc.encode(prompt[0].content + prompt[1].content)
             )
-            response = self.llm.converse(
-                modelId=self.CHAT_MODEL_ID, messages=messages, system=system
-            )
-            return (
-                response["output"]["message"]["content"][0]["text"]
-                .strip("\n")
-                .strip()
-                .replace("\n", "")
-            )
+            try:
+                response = self.llm.converse(
+                    modelId=self.CHAT_MODEL_ID, messages=messages, system=system
+                )
+                response = response["output"]["message"]["content"][0]["text"]
+                response = response.strip("\n").strip().replace("\n", "")
+            except Exception as e:
+                logger.error(f"Error in calling the LLM: {e}")
+                response = f"Finish[]"
+            return response
         else:
             raise ValueError("The given llm_version is not correct.")
 
