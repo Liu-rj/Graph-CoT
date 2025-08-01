@@ -20,7 +20,8 @@ logger = logging.getLogger(__name__)
 
 from IPython import embed
 
-NODE_TEXT_KEYS = {'maple': {'paper': ['title'], 'author': ['name'], 'venue': ['name']},
+NODE_TEXT_KEYS = {'webqsp': {'node': ['name']},
+                  'maple': {'paper': ['title'], 'author': ['name'], 'venue': ['name']},
                   'amazon': {'item': ['title'], 'brand': ['name']},
                   'biomedical': {'Anatomy': ['name'], 'Biological_Process':['name'], 'Cellular_Component':['name'], 'Compound':['name'], 'Disease':['name'], 'Gene':['name'], 'Molecular_Function':['name'], 'Pathway':['name'], 'Pharmacologic_Class':['name'], 'Side_Effect':['name'], 'Symptom':['name']},
                   'legal': {'opinion': ['plain_text'], 'opinion_cluster': ['syllabus'], 'docket': ['pacer_case_id', 'case_name'], 'court': ['full_name']},

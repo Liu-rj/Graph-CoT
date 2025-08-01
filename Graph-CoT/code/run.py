@@ -98,6 +98,8 @@ def main():
         graph_agent_prompt if not args.zero_shot else graph_agent_prompt_zeroshot
     )
     agent = GraphAgent(args, agent_prompt)
+    agent.load_graph(args.graph_dir)
+    agent.set_graph_funcs(agent.graph)
 
     question_types = [
         "single_entity_abstract_rephrased",

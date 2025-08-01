@@ -1,4 +1,17 @@
 EXAMPLES = {
+    "webqsp": """Definition of the graph: It is a subgraph extracted from freebase. There are only one type of nodes in the graph: node.
+        nodes have only one features: name.
+        nodes are interconnected to each other by a variety of relations.
+        Question: What is the name of justin bieber brother?
+        Thought 1: The question is asking some basic information of a node (justin bieber brother). We need to find the node in the graph.
+        Action 1: RetrieveNode[justin bieber]
+        Observation 1: The ID of this node is "justin bieber".
+        Thought 2: The question is asking the name of a person, we need to check the node feature (name) from the graph.
+        Action 2: NodeFeature["justin bieber", name]
+        Observation 2: Jaxon Bieber
+        Thought 3: The published date of the paper is Jaxon Bieber.
+        Action 3: Finish[Jaxon Bieber]
+        """,
     "maple": """Definition of the graph: There are three types of nodes in the graph: paper, author and venue.
         Paper nodes have features: title, abstract, year and label. Author nodes have features: name. Venue nodes have features: name.
         Paper nodes are linked to their author nodes, venue nodes, reference paper nodes and cited_by paper nodes. Author nodes are linked to their paper nodes. Venue nodes are linked to their paper nodes.

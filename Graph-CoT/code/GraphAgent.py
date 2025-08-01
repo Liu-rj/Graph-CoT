@@ -67,7 +67,7 @@ class GraphAgent:
                 device_map="auto",
             )
         elif args.llm_version in ["claude-3.5-sonnet"]:
-            self.CHAT_MODEL_ID = "anthropic.claude-3.5-sonnet-20240620-v1:0"
+            self.CHAT_MODEL_ID = "anthropic.claude-3-5-sonnet-20240620-v1:0"
             self.llm = boto3.client(
                 service_name="bedrock-runtime",
                 region_name="us-west-2",
@@ -98,8 +98,8 @@ class GraphAgent:
             raise ValueError("The given llm_version is not correct.")
 
         self.graph_definition = GRAPH_DEFINITION[args.dataset]
-        self.load_graph(args.graph_dir)
-        self.graph_funcs = graph_funcs.graph_funcs(self.graph)
+        # self.load_graph(args.graph_dir.format(id=0))
+        # self.graph_funcs = graph_funcs.graph_funcs(self.graph)
         # self.node_retriever = retriever.Retriever(args, self.graph)
 
         self.token_count = 0
@@ -110,6 +110,9 @@ class GraphAgent:
     def load_graph(self, graph_dir):
         logger.info("Loading the graph...")
         self.graph = json.load(open(graph_dir))
+    
+    def set_graph_funcs(self, graph):
+        self.graph_funcs = graph_funcs.graph_funcs(graph)
 
     def run(self, question, id_mapping, answer, reset=True) -> None:
         if reset:
