@@ -3,13 +3,14 @@ from typing import List, Union, Literal
 from enum import Enum
 import tiktoken
 import openai
+from openai import OpenAI
 import time
 import json
 
 # from langchain_community.llms import OpenAI
 # from langchain_community.chat_models import ChatOpenAI
 
-from langchain.prompts import PromptTemplate, ChatPromptTemplate
+# from langchain.prompts import PromptTemplate, ChatPromptTemplate
 from graph_prompts import GRAPH_DEFINITION
 from graph_fewshots import EXAMPLES
 from tools import graph_funcs, retriever
@@ -34,22 +35,19 @@ class GraphAgent:
         self.examples = EXAMPLES[args.ref_dataset]
 
         self.llm_version = args.llm_version
+        self.sampling_params = {}
         if args.llm_version in [
-            "gpt-3.5-turbo",
-            "gpt-4",
-            "gpt-3.5-turbo-1106",
-            "gpt-3.5-turbo-16k",
+            # "gpt-3.5-turbo",
+            # "gpt-4",
+            # "gpt-3.5-turbo-1106",
+            # "gpt-3.5-turbo-16k",
+            "deepseek-chat"
         ]:
-            # self.llm = ChatOpenAI(
-            #     temperature=0,
-            #     max_tokens=300,
-            #     model_name=args.llm_version,
-            #     model_kwargs={"stop": "\n"},
-            # )
-            # self.enc = tiktoken.encoding_for_model("text-davinci-003")
-            raise NotImplementedError(
-                "The OpenAI API is not supported in this version. Please use the Bedrock API instead."
+            self.llm = OpenAI(
+                api_key=os.getenv("DEEPSEEK_API_KEY"),
+                base_url="https://api.deepseek.com",
             )
+            self.enc = tiktoken.encoding_for_model("text-davinci-003")
         elif args.llm_version in [
             "meta-llama/Llama-2-13b-chat-hf",
             "mistralai/Mixtral-8x7B-Instruct-v0.1",
@@ -94,6 +92,24 @@ class GraphAgent:
                 region_name="us-west-2",
             )
             self.enc = tiktoken.encoding_for_model("text-davinci-003")
+        elif args.llm_version in ["Qwen/Qwen3-8B", "Qwen/Qwen3-14B"]:
+            self.llm = OpenAI(
+                api_key="EMPTY",
+                base_url="http://localhost:8000/v1",
+            )
+            self.enc = tiktoken.encoding_for_model("text-davinci-003")
+            self.sampling_params = {
+                # Standard OpenAI parameters
+                "temperature": 0.7,
+                "top_p": 0.8,
+                "max_tokens": 8192,
+                # vLLM-specific (or Qwen3-specific) parameters
+                "extra_body": {
+                    "top_k": 20,
+                    "min_p": 0.0,
+                    "chat_template_kwargs": {"enable_thinking": False},
+                },
+            }
         else:
             raise ValueError("The given llm_version is not correct.")
 
@@ -258,8 +274,27 @@ class GraphAgent:
             "gpt-4",
             "gpt-3.5-turbo-1106",
             "gpt-3.5-turbo-16k",
+            "deepseek-chat",
+            "Qwen/Qwen3-8B",
+            "Qwen/Qwen3-14B",
         ]:
-            return gpt_format_step(self.llm(self._build_agent_prompt()))
+            self.api_calls += 1
+            prompt = self._build_agent_prompt()
+            messages = [{"role": "system", "content": prompt[0].content},
+                        {"role": "user", "content": prompt[1].content}]
+            self.token_count += len(
+                self.enc.encode(prompt[0].content + prompt[1].content)
+            )
+            try:
+                response = self.llm.chat.completions.create(
+                    model=self.llm_version, messages=messages, stream=False, **self.sampling_params
+                )
+                response = response.choices[0].message.content
+                response = response.strip("\n").strip().replace("\n", "")
+            except Exception as e:
+                logger.error(f"Error in calling the LLM: {e}")
+                response = f"Finish[]"
+            return response
         elif self.llm_version in [
             "meta-llama/Llama-2-13b-chat-hf",
             "mistralai/Mixtral-8x7B-Instruct-v0.1",

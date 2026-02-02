@@ -57,7 +57,10 @@ assert args.llm_version in [
     "claude-3.5-sonnet",
     "llama-3.1-405b",
     "mistral-large",
-    "deepseek-r1"
+    "deepseek-r1",
+    "deepseek-chat",
+    "Qwen/Qwen3-8B",
+    "Qwen/Qwen3-14B",
 ]
 
 
@@ -102,11 +105,11 @@ def main():
     agent.set_graph_funcs(agent.graph)
 
     question_types = [
-        "single_entity_abstract_rephrased",
-        "single_entity_concrete_rephrased",
-        "multi_entity_abstract_rephrased",
-        "multi_entity_concrete_rephrased",
-        "nested_question_rephrased"
+        "single_entity_abstract",
+        "single_entity_concrete",
+        "multi_entity_abstract",
+        "multi_entity_concrete",
+        "nested_question"
     ]
     for question_type in question_types:
         print("############################################")

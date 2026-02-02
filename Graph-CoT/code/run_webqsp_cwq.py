@@ -58,7 +58,10 @@ assert args.llm_version in [
     "claude-3.5-sonnet",
     "llama-3.1-405b",
     "mistral-large",
-    "deepseek-r1"
+    "deepseek-r1",
+    "deepseek-chat",
+    "Qwen/Qwen3-8B",
+    "Qwen/Qwen3-14B",
 ]
 
 
@@ -85,8 +88,23 @@ def main():
     )
     agent = GraphAgent(args, agent_prompt)
 
-    dataset = load_dataset(f"rmanluo/RoG-{args.dataset}", split="test")
-    for it, item in enumerate(dataset):
+    dataset = load_dataset(f"rmanluo/RoG-{args.dataset}",
+                           split="test",
+                           cache_dir="datasets",  # Set your desired folder here
+    )
+    
+    # resume from history
+    start_id = 0
+    if os.path.exists(output_file_path):
+        with open(output_file_path, "r") as f:
+            done_lines = f.readlines()
+        done_count = len(done_lines)
+        print(f"Resuming from {done_count} done questions.")
+        dataset = dataset.select(range(done_count, len(dataset)))
+        start_id = done_count
+
+    for it, item in enumerate(dataset, start=start_id):
+        print(f"Processing {it}-th question, id: {item['id']}")
         question = item["question"]
         id_mapping = {}
         for entity in item["q_entity"]:
